@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"></head>
+<body>
+<script>
+window['ai_edge_gallery_get_result'] = async (data) => {
+    try {
+        const input = JSON.parse(data);
+        let text = input.text || input.content || "";
+
+        if (!text) {
+            return JSON.stringify({ error: "沒有收到文字內容" });
+        }
+
+        // === 高精度 PII 正規表達式（同時支援香港與台灣格式）===
+        const patterns = [
+            // 1. Email (通用)
+            [/\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/gi, "【電子郵件已屏蔽】"],
+            
+            // 2. 香港身份證字號 (HKID) - 支援 1 或 2 個大寫字母 + 6 位數字 + 括號內數字或 A
+            [/[A-Z]{1,2}\d{6}\([\dA]\)/gi, "【香港身份證號已屏蔽】"],
+            // 備用香港身份證（防範用戶沒輸入括號，如 A1234567）
+            [/\b[A-Z]{1,2}\d{6}[\dA]\b/gi, "【香港身份證號已屏蔽】"],
+
+            // 3. 香港電話/手機號碼 - 8 位數字，通常以 2, 3, 5, 6, 7, 8, 9 開頭，支援空格或連字號
+            [/\b[2356789]\d{3}[-.\s]?\d{4}\b/g, "【電話號碼已屏蔽】"],
+
+            // 4. 台灣身分證字號
+            [/[A-Z][12]\d{8}/g, "【身分證字號已屏蔽】"],
+            
+            // 5. 台灣手機與市話
+            [/09\d{2}[-.\s]?\d{3}[-.\s]?\d{3}/g, "【手機號碼已屏蔽】"],
+            [/0[2-8]\d{0,2}[-.\s]?\d{3,4}[-.\s]?\d{3,4}/g, "【電話號碼已屏蔽】"],
+            
+            // 6. 信用卡/金融卡 (通用 13-19 位數)
+            [/\b(?:\d[ -]*?){13,19}\b/g, "【信用卡/金融卡號已屏蔽】"],
+            
+            // 7. 護照號碼 (通用)
+            [/\b[A-Z]{1,2}\d{7,9}\b/g, "【護照號碼已屏蔽】"]
+        ];
+
+        let redacted = text;
+        for (const [regex, replacement] of patterns) {
+            redacted = redacted.replace(regex, replacement);
+        }
+
+        return JSON.stringify({
+            result: redacted,
+            masked_count: (redacted.match(/【[^】]+已屏蔽】/g) || []).length
+        });
+    } catch (e) {
+        return JSON.stringify({ error: e.message });
+    }
+};
+</script>
+</body>
+</html>
