@@ -1,18 +1,18 @@
 ---
-name: pii-redactor
-description: 自動偵測並屏蔽上傳附件中的個人敏感資料（包含香港與台灣的身份證、手機、Email、信用卡、護照等），替換成清楚的安全標示。適合處理 PDF、DOCX、TXT、圖片等附件。
+name: "pii-redactor"
+description: "自動偵測並屏蔽上傳附件中的個人敏感資料（包含香港與台灣的身份證、手機、Email、信用卡、護照等），替換成清楚的安全標示。適合處理 PDF、DOCX、TXT、圖片等附件。"
 ---
 
 # PII Redactor（敏感資料自動屏蔽）
 
 ## 觸發時機
-當用戶上傳任何檔案（PDF、DOCX、TXT、圖片等）並要求「屏蔽敏感資料」、「mask PII」、「自動替換個人資料」、「hide my ID/phone/email」等時，立即啟動此 skill。
+當用戶上傳任何檔案（PDF、DOCX、TXT、圖片等）並要求「屏蔽敏感資料」、「mask PII」、「自動替換個人資料環境」、「hide my ID/phone/email」等時，立即啟動此 skill。
 
 ## 執行流程
 1. 接收用戶上傳的附件內容（文字或 OCR 結果）。
-2. **【核心步驟】將接收到的文本內容，完整傳遞給本地腳本 (Local Execution Script: scripts/index.html) 進行高精度精確屏蔽處理。**
-3. 接收本地腳本處理完畢後回傳的 `result` 安全文本。
-4. 將該 **完整 masked 後的文字** 輸出給用戶，務必保持原有排版與結構，讓用戶可以直接複製存檔。
+2. 將接收到的文本內容，完整傳遞給本地腳本 (Local Execution Script: scripts/index.html) 進行高精度精確屏蔽處理。
+3. 接收本地腳本處理完畢後回傳的 result 安全文本。
+4. 將該 完整 masked 後的文字 輸出給用戶，務必保持原有排版與結構，讓用戶可以直接複製存檔。
 5. 如果判斷來源是圖片或 PDF，需在輸出結果後加上提醒：「文字層已處理完成，若需處理原始檔案的視覺遮罩，請使用電腦版工具輔助。」
 
 ## 注意事項
